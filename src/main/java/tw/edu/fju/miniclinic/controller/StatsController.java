@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import tw.edu.fju.miniclinic.model.AppointmentRepository;
 import tw.edu.fju.miniclinic.model.DoctorRepository;
 import tw.edu.fju.miniclinic.model.PatientRepository;
@@ -40,5 +41,20 @@ public class StatsController {
         model.addAttribute("deptStats", deptStats);
 
         return "stats";
+    }
+
+    @GetMapping("/api/stats")
+    @ResponseBody
+    public Map<String, Object> getApiStats() {
+        return Map.of(
+                "totalDoctors", doctorRepo.count(),
+                "totalPatients", patientRepo.count(),
+                "totalAppointments", appointmentRepo.count(),
+                "byStatus", Map.of(
+                        "BOOKED", appointmentRepo.countByStatus("BOOKED"),
+                        "COMPLETED", appointmentRepo.countByStatus("COMPLETED"),
+                        "CANCELLED", appointmentRepo.countByStatus("CANCELLED")
+                )
+        );
     }
 }
